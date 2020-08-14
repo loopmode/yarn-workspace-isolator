@@ -7,7 +7,7 @@ function runCommandAsyncPipe(cwd, command, args, stdin) {
     const stderr = Buffer.alloc(1024)
     let stderrLength = 0
 
-    const process = childProcess.spawn(command, args, { cwd, stdio: 'pipe' })
+    const process = childProcess.spawn(command, args, { cwd, stdio: 'pipe', shell: true })
 
     process.stdout.on('data', chunk => {
       chunk.copy(stdout, stdoutLength)
@@ -37,7 +37,7 @@ function runCommandAsyncPipe(cwd, command, args, stdin) {
 
 function runCommandAsyncInherit(cwd, command, args) {
   return new Promise((resolve, reject) => {
-    const process = childProcess.spawn(command, args, { cwd, stdio: 'inherit' })
+    const process = childProcess.spawn(command, args, { cwd, stdio: 'inherit', shell: true })
 
     process.on('close', code => {
       if (code === 0) {
