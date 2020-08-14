@@ -57,16 +57,18 @@ function getWorkspaceDependencies(workspaces, workspaceName) {
 }
 
 async function localizeWorkspaceDependencies(packageJsonFile, workspaces, localNodeModulesFolder) {
+  const dependencyMapper = (ver, dep) => {
+    if (!!workspaces[dep]) {
+      return 'file:' + path.join(localNodeModulesFolder, dep)
+    } else {
+      return ver
+    }
+  }
   const packageJson = JSON.parse(await readFileAsync(packageJsonFile))
   const nextPackageJson = {
     ...packageJson,
-    dependencies: mapValues(packageJson.dependencies || {}, (ver, dep) => {
-      if (!!workspaces[dep]) {
-        return 'file:' + path.join(localNodeModulesFolder, dep)
-      } else {
-        return ver
-      }
-    }),
+    dependencies: mapValues(packageJson.dependencies || {}, dependencyMapper),
+    devDependencies: mapValues(packageJson.devDependencies || {}, dependencyMapper),
   }
   await writeFileAsync(packageJsonFile, JSON.stringify(nextPackageJson, null, 2))
 }
